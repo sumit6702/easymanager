@@ -6,3 +6,5 @@
   status: Executed
 - name: GrubSecureBoot
   source: /home/sumit/easypeasy/scripts/grub-secureboot.sh
+- name: AutoMonitor
+  source: /home/sumit/easypeasy/scripts/auto-monitor.py
