@@ -1,0 +1,8 @@
+- name: ZenRestart
+  source: /home/sumit/easypeasy/scripts/zen-restart.sh
+  status: Executed
+- name: HyprSession
+  source: /home/sumit/easypeasy/scripts/hypr-session.sh
+  status: Executed
+- name: GrubSecureBoot
+  source: /home/sumit/easypeasy/scripts/grub-secureboot.sh
