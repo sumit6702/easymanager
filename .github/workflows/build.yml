@@ -7,7 +7,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write # Grant permission to create a GitHub release
+  contents: write # Grants permission to create a release
 
 jobs:
   build:
@@ -33,7 +33,7 @@ jobs:
         run: |
           nuitka --follow-imports --standalone --output-dir=build easyscripts.py
 
-      - name: Debug List Build Directory
+      - name: "Debug: List Build Directory"
         run: ls -R build/
 
       - name: Upload Build Artifacts
@@ -42,14 +42,27 @@ jobs:
           name: compiled-binaries
           path: build/
 
+  release:
+    needs: build # Waits for the build job to complete
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Compiled Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: compiled-binaries
+          path: build/
+
+      - name: List Downloaded Files
+        run: ls -R build/
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            build/easydots.dist/easydots
-            build/easydots.dist/easydots.exe
-            build/easyscripts.dist/easyscripts
-            build/easyscripts.dist/easyscripts.exe
-          tag_name: v1.0.0 # Modify dynamically if needed
+          files: build/*
+          tag_name: v1.0.1 # Change dynamically if needed
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
