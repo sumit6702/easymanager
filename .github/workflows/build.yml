@@ -7,7 +7,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write  # Grants permission to create a GitHub release
+  contents: write # Grants permission to create a GitHub release
 
 jobs:
   build:
@@ -33,7 +33,7 @@ jobs:
         run: |
           nuitka --follow-imports --standalone --output-dir=build easyscripts.py
 
-      - name: Debug: List Build Directory
+      - name: Debug List Build Directory
         run: ls -R build/
 
       - name: Package Binaries into tar.xz
@@ -48,7 +48,7 @@ jobs:
           path: build/easymanager.tar.xz
 
   release:
-    needs: build  # Waits for the build job to complete
+    needs: build # Waits for the build job to complete
     runs-on: ubuntu-latest
 
     steps:
@@ -67,7 +67,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/easymanager.tar.xz  # Uploads the tar.xz archive
-          tag_name: v1.0.3  # Change dynamically if needed
+          files: build/easymanager.tar.xz # Uploads the tar.xz archive
+          tag_name: v1.0.3 # Change dynamically if needed
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
