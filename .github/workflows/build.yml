@@ -3,7 +3,7 @@ name: Build and Release Linux Binaries
 on:
   push:
     tags:
-      - "v1.0.4"
+      - "v*"
 
 jobs:
   build:
@@ -30,25 +30,20 @@ jobs:
             --assume-yes-for-downloads \
             easydots.py
 
-      - name: Build easyscripts
-        run: |
-          python -m nuitka \
-            --onefile \
-            --standalone \
-            --output-dir=build \
-            --assume-yes-for-downloads \
-            easyscripts.py
+      - name: Verify build files
+        run: ls -lR build # Debugging step to check file structure
 
       - name: Create compressed archives
         run: |
           mkdir -p dist
-          tar -cJf dist/easydots-linux.tar.xz -C build easydots
-          tar -cJf dist/easyscripts-linux.tar.xz -C build easyscripts
+          tar -cJf dist/easydots-linux.tar.xz -C build/easydots.dist easydots
+          tar -cJf dist/easyscripts-linux.tar.xz -C build/easyscripts.dist easyscripts
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             dist/*.tar.xz
+          tag_name: ${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
