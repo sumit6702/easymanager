@@ -62,7 +62,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/*
-          tag_name: v1.0.1 # Change dynamically if needed
+          files: build/**/*.bin # Assuming the binaries have a .bin extension
+          tag_name: v1.0.2 # Change dynamically if needed
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
