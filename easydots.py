@@ -9,12 +9,14 @@ from rich.prompt import Confirm
 app = typer.Typer()
 console = Console()
 
-CONFIG_FILE = "configdots.yml"
+CONFIG_FILE = os.path.expanduser("~/.config/easymanager/configdots.yml")
 DOTFILES_DIR = "dotfiles"
 
 
 def load_config():
     if not os.path.exists(CONFIG_FILE):
+        Path(CONFIG_FILE).parent.mkdir(parents=True, exist_ok=True)
+        Path(CONFIG_FILE).touch()
         return []
     with open(CONFIG_FILE, "r") as f:
         return yaml.safe_load(f) or []

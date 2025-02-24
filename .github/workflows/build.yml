@@ -1,0 +1,47 @@
+name: Build Python Binary with Nuitka
+
+on:
+  push:
+    branches:
+      - main # Run on pushes to main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3 python3-pip
+          pip install -r requirements.txt
+          pip install nuitka
+
+      - name: Build `easydots.py` Binary
+        run: |
+          mkdir -p build
+          nuitka --follow-imports --standalone --output-dir=build easydots.py
+
+      - name: Build `easyscripts.py` Binary
+        run: |
+          nuitka --follow-imports --standalone --output-dir=build easyscripts.py
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: compiled-binaries
+          path: build/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/easydots.dist/easydots
+            build/easyscripts.dist/easyscripts
+          tag_name: v1.0.0 # Change this dynamically if needed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

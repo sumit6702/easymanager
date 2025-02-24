@@ -9,11 +9,13 @@ from rich.prompt import Confirm
 app = typer.Typer()
 console = Console()
 
-SCRIPT_FILE = "scripts.yml"
+SCRIPT_FILE = os.path.expanduser("~/.config/easymanager/configscripts.yml")
 
 
 def load_scripts():
     if not os.path.exists(SCRIPT_FILE):
+        Path(SCRIPT_FILE).parent.mkdir(parents=True, exist_ok=True)
+        Path(SCRIPT_FILE).touch()
         return []
     with open(SCRIPT_FILE, "r") as f:
         return yaml.safe_load(f) or []
