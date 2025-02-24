@@ -1,49 +1,70 @@
-name: Build and Release Linux Binaries
+name: Build Python Binary with Nuitka
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3 python3-pip
+          pip install -r requirements.txt
+          pip install nuitka
+
+      - name: Build `easydots.py` Binary
+        run: |
+          mkdir -p build
+          nuitka --follow-imports --standalone --output-dir=build easydots.py
+
+      - name: Build `easyscripts.py` Binary
+        run: |
+          nuitka --follow-imports --standalone --output-dir=build easyscripts.py
+
+      - name: Debug List Build Directory
+        run: ls -R build/
+
+      - name: Package Binaries into tar.xz
+        run: |
+          tar -cJf build/easymanager.tar.xz -C build .
+          ls -lh build/
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          python-version: "3.x"
+          name: compiled-binaries
+          path: build/easymanager.tar.xz
 
-      - name: Install Nuitka
-        run: pip install nuitka
+  release:
+    needs: build # Waits for the build job to complete
+    runs-on: ubuntu-latest
 
-      - name: Build easydots
-        run: |
-          python -m nuitka \
-            --onefile \
-            --standalone \
-            --output-dir=build \
-            --assume-yes-for-downloads \
-            easydots.py
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Verify build files
-        run: ls -lR build # Debugging step to check file structure
+      - name: Download Compiled Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: compiled-binaries
+          path: build/
 
-      - name: Create compressed archives
-        run: |
-          mkdir -p dist
-          tar -cJf dist/easydots-linux.tar.xz -C build/easydots.dist easydots
-          tar -cJf dist/easyscripts-linux.tar.xz -C build/easyscripts.dist easyscripts
+      - name: List Downloaded Files
+        run: ls -lh build/
 
-      - name: Upload to Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            dist/*.tar.xz
-          tag_name: ${{ github.ref }}
+          files: build/easymanager.tar.xz
+          tag_name: v1.0.6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
