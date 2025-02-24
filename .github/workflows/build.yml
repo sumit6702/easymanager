@@ -7,7 +7,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write # Grants permission to create a release
+  contents: write  # Grants permission to create a GitHub release
 
 jobs:
   build:
@@ -33,17 +33,22 @@ jobs:
         run: |
           nuitka --follow-imports --standalone --output-dir=build easyscripts.py
 
-      - name: "Debug: List Build Directory"
+      - name: Debug: List Build Directory
         run: ls -R build/
+
+      - name: Package Binaries into tar.xz
+        run: |
+          tar -cJf build/easymanager.tar.xz -C build .
+          ls -lh build/
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: compiled-binaries
-          path: build/
+          path: build/easymanager.tar.xz
 
   release:
-    needs: build # Waits for the build job to complete
+    needs: build  # Waits for the build job to complete
     runs-on: ubuntu-latest
 
     steps:
@@ -57,12 +62,12 @@ jobs:
           path: build/
 
       - name: List Downloaded Files
-        run: ls -R build/
+        run: ls -lh build/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/**/*.bin # Assuming the binaries have a .bin extension
-          tag_name: v1.0.2 # Change dynamically if needed
+          files: build/easymanager.tar.xz  # Uploads the tar.xz archive
+          tag_name: v1.0.3  # Change dynamically if needed
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
