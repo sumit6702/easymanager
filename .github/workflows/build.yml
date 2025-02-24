@@ -18,6 +18,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y python3 python3-pip
+          pip install --upgrade pip
           pip install -r requirements.txt
           pip install nuitka
 
@@ -30,19 +31,20 @@ jobs:
         run: |
           nuitka --follow-imports --standalone --output-dir=build easyscripts.py
 
-      - name: Debug List Build Directory
+      - name: Debug – List Build Directory
         run: ls -R build/
 
       - name: Package Binaries into tar.xz
         run: |
-          tar -cJf build/easymanager.tar.xz -C build .
-          ls -lh build/
+          mkdir -p dist  # Create a separate directory for the archive
+          tar -cJf dist/easymanager.tar.xz -C build .  # Archive everything in 'build'
+          ls -lh dist/
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: compiled-binaries
-          path: build/easymanager.tar.xz
+          path: dist/easymanager.tar.xz
 
   release:
     needs: build # Waits for the build job to complete
@@ -56,15 +58,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: compiled-binaries
-          path: build/
+          path: dist/
 
       - name: List Downloaded Files
-        run: ls -lh build/
+        run: ls -lh dist/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/easymanager.tar.xz
-          tag_name: v1.0.6
+          files: dist/easymanager.tar.xz # Use the correct path to the archive
+          tag_name: v1.0.7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
