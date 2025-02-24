@@ -38,7 +38,7 @@ jobs:
 
       - name: Package Binaries into tar.xz
         run: |
-          tar -cJf build/easymanager.tar.xz -C build .
+          tar --warning=no-file-changed -cJf build/easymanager.tar.xz -C build .
           ls -lh build/
 
       - name: Upload Build Artifacts
