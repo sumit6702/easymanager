@@ -3,16 +3,16 @@ name: Build Python Binary with Nuitka
 on:
   push:
     branches:
-      - main # Run on pushes to main
+      - main # Adjust to your default branch
   pull_request:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Dependencies
         run: |
@@ -31,7 +31,7 @@ jobs:
           nuitka --follow-imports --standalone --output-dir=build easyscripts.py
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: compiled-binaries
           path: build/
