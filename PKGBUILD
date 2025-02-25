@@ -1,19 +1,30 @@
+# Maintainer: Your Name <your.email@example.com>
 pkgname=easymanager
 pkgver=1.0.8
 pkgrel=1
+pkgdesc="A simple manager for easydots and easyscripts"
 arch=('x86_64')
-pkgdesc="A standalone binary package containing easydots and easyscripts"
 url="https://github.com/sumit6702/easymanager"
-license=('MIT') # Change if needed
-source=("easymanager.tar.xz")
-sha256sums=('SKIP') # Replace with actual checksum if needed
+license=('MIT')
+source=("${url}/releases/download/v${pkgver}/easymanager.tar.xz")
+sha256sums=('SKIP')
 
 package() {
-    # Extract to package directory
-    mkdir -p "$pkgdir/opt/easymanager"
-    tar -xJf "$srcdir/easymanager.tar.xz" -C "$pkgdir/opt/easymanager"
+    cd "$srcdir"
+    tar -xJf easymanager.tar.xz
 
-    # Create symlinks for easy access
-    install -Dm755 "$pkgdir/opt/easymanager/easydots/easydots" "$pkgdir/usr/bin/easydots"
-    install -Dm755 "$pkgdir/opt/easymanager/easyscripts/easyscripts" "$pkgdir/usr/bin/easyscripts"
+    # Create directories in $pkgdir if they don't exist
+    install -d "$pkgdir/usr/bin"
+    install -d "$pkgdir/opt/easymanager/easydots"
+    install -d "$pkgdir/opt/easymanager/easyscripts"
+
+    cd "dist/easymanager"
+
+    # Copy the directories into /opt, maintaining permissions and structure
+    cp -r easydots "$pkgdir/opt/easymanager/"
+    cp -r easyscripts "$pkgdir/opt/easymanager/"
+
+    # Create symlinks in /usr/bin pointing to the binaries in /opt
+    ln -s "/opt/easymanager/easydots/easydots.bin" "$pkgdir/usr/bin/easydots"
+    ln -s "/opt/easymanager/easyscripts/easyscripts.bin" "$pkgdir/usr/bin/easyscripts"
 }
