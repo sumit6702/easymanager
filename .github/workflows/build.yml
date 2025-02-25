@@ -36,8 +36,10 @@ jobs:
 
       - name: Package Binaries into tar.xz
         run: |
-          mkdir -p dist  # Create a separate directory for the archive
-          tar -cJf dist/easymanager.tar.xz -C build .  # Archive everything in 'build'
+          mkdir -p dist/easymanager
+          cp -r build/easydots.dist dist/easymanager/easydots
+          cp -r build/easyscripts.dist dist/easymanager/easyscripts
+          tar -cJf dist/easymanager.tar.xz dist/easymanager
           ls -lh dist/
 
       - name: Upload Build Artifacts
@@ -67,6 +69,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: dist/easymanager.tar.xz # Use the correct path to the archive
-          tag_name: v1.0.7
+          tag_name: v1.0.8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
